@@ -1,41 +1,57 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from "react";
+import { usePathname, useRouter } from "next/navigation";
 
 import { Icon } from "@/components/ui/icon";
-import type { SearchCategory } from "@/lib/domain/search";
+import { parseSearchCategory } from "@/lib/domain/search";
 
 import styles from "./search-form.module.css";
 
-export function SearchForm({ initialQuery, category }: { initialQuery: string; category: SearchCategory }) {
+export function SearchForm() {
   const router = useRouter();
-  const [query, setQuery] = useState(initialQuery);
-  const firstRender = useRef(true);
+  const pathname = usePathname();
+  const [query, setQuery] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useLayoutEffect(() => {
+    if (document.activeElement === inputRef.current) return;
+    setQuery(readUrlQuery());
+  }, [pathname]);
 
   useEffect(() => {
-    if (firstRender.current) {
-      firstRender.current = false;
-      return;
+    function syncFromHistory() {
+      if (document.activeElement === inputRef.current) return;
+      setQuery(readUrlQuery());
     }
-    const normalized = normalizeQuery(query);
-    if (!normalized || normalized === initialQuery) return;
+    window.addEventListener("popstate", syncFromHistory);
+    return () => window.removeEventListener("popstate", syncFromHistory);
+  }, []);
+
+  useEffect(() => {
     const timeout = window.setTimeout(() => {
-      const params = new URLSearchParams({ q: normalized, type: category });
-      router.replace(`/search?${params.toString()}`);
+      const normalized = normalizeQuery(query);
+      if (!normalized) return;
+      const nextCategory = parseSearchCategory(new URL(window.location.href).searchParams.get("type"));
+      const currentQuery = readUrlQuery();
+      if (normalized === currentQuery && window.location.pathname === "/search") return;
+      const params = new URLSearchParams({ q: normalized, type: nextCategory });
+      router.replace(`/search?${params.toString()}`, { scroll: false });
     }, 500);
     return () => window.clearTimeout(timeout);
-  }, [category, initialQuery, query, router]);
+  }, [query, router]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    inputRef.current?.blur();
     const normalized = normalizeQuery(query);
     if (!normalized) {
-      router.push("/");
+      router.push("/", { scroll: false });
       return;
     }
-    const params = new URLSearchParams({ q: normalized, type: category });
-    router.push(`/search?${params.toString()}`);
+    const nextCategory = parseSearchCategory(new URL(window.location.href).searchParams.get("type"));
+    const params = new URLSearchParams({ q: normalized, type: nextCategory });
+    router.push(`/search?${params.toString()}`, { scroll: false });
   }
 
   return (
@@ -47,6 +63,7 @@ export function SearchForm({ initialQuery, category }: { initialQuery: string; c
         id="catalog-search"
         name="q"
         type="search"
+        ref={inputRef}
         value={query}
         maxLength={200}
         placeholder="Track, artist, or album"
@@ -61,6 +78,10 @@ export function SearchForm({ initialQuery, category }: { initialQuery: string; c
       </button>
     </form>
   );
+}
+
+function readUrlQuery(): string {
+  return (new URL(window.location.href).searchParams.get("q") ?? "").trim().slice(0, 200);
 }
 
 function normalizeQuery(value: string): string {

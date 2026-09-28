@@ -5,6 +5,7 @@ import { IntroDialog } from "@/features/intro/intro-dialog";
 import { SavedLibraryProvider } from "@/features/library/saved-library-provider";
 import { AppNav } from "@/features/navigation/app-nav";
 import { ServiceWorkerRegister } from "@/features/pwa/service-worker-register";
+import { CatalogChrome } from "@/features/search/catalog-chrome";
 import { THEME_BOOTSTRAP_SCRIPT, THEME_CANVAS } from "@/lib/domain/theme";
 
 import "./globals.css";
@@ -41,7 +42,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <AppNav />
           <SavedLibraryProvider>
             <main className="app-main" id="main-content">
-              {children}
+              <CatalogChrome>{children}</CatalogChrome>
             </main>
           </SavedLibraryProvider>
         </div>
