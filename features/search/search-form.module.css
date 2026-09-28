@@ -1,0 +1,110 @@
+.form {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 2.75rem;
+  padding: 0.2rem 0.2rem 0.2rem 0.65rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.form:focus-within {
+  border-color: var(--color-text);
+  background: var(--color-surface-focus);
+}
+
+.label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.icon {
+  color: var(--color-text-muted);
+}
+
+.input {
+  min-width: 0;
+  width: 100%;
+  border: 0;
+  outline: none;
+  box-shadow: none;
+  appearance: none;
+  background: transparent;
+  color: var(--color-text);
+  font-size: 0.93rem;
+}
+
+.input:focus,
+.input:focus-visible {
+  border: 0;
+  outline: none;
+  box-shadow: none;
+}
+
+.input::placeholder {
+  color: var(--color-text-muted);
+  opacity: 1;
+}
+
+:global(html:not([data-theme="light"])) .input::-webkit-search-cancel-button {
+  filter: invert(1);
+}
+
+.submit {
+  display: inline-grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  cursor: pointer;
+}
+
+.submit span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+@media (min-width: 48rem) {
+  .form {
+    min-height: 2.75rem;
+    padding-left: 0.7rem;
+  }
+
+  .input {
+    font-size: 1rem;
+  }
+
+  .submit {
+    display: inline-flex;
+    width: auto;
+    min-width: 5.5rem;
+    height: 2.25rem;
+    padding-inline: 0.75rem;
+    gap: var(--space-2);
+    border-radius: var(--radius-sm);
+    font-size: 0.86rem;
+    font-weight: 600;
+  }
+
+  .submit span {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
+  }
+}
