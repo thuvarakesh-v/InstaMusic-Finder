@@ -1,0 +1,28 @@
+.layout {
+  max-width: 38rem;
+}
+
+.layout h1 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 1.25rem;
+}
+
+.layout p {
+  margin: var(--space-2) 0 var(--space-4);
+}
+
+.retry {
+  min-height: 2.75rem;
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.retry:hover {
+  background: var(--color-accent-hover);
+}
