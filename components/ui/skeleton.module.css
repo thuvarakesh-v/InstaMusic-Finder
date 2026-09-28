@@ -1,0 +1,43 @@
+.list {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr) 4.5rem;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 4.75rem;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.art,
+.text i,
+.action {
+  display: block;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(90deg, var(--color-skeleton) 0%, var(--color-skeleton-highlight) 50%, var(--color-skeleton) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+.art {
+  width: 3rem;
+  height: 3rem;
+}
+
+.text {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.text i:first-child { width: 70%; height: 0.8rem; }
+.text i:last-child { width: 45%; height: 0.6rem; }
+.action { width: 4.5rem; height: 2.3rem; }
+
+@keyframes shimmer {
+  to { background-position: -200% 0; }
+}

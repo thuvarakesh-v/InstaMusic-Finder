@@ -1,0 +1,53 @@
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 0;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+}
+
+.glyph {
+  width: 2.15rem;
+  height: 2.15rem;
+  flex: 0 0 auto;
+  overflow: visible;
+  color: var(--color-accent);
+}
+
+.frame,
+.grooveCutout {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.frame {
+  stroke-width: 5;
+}
+
+.record {
+  fill: currentColor;
+}
+
+.recordCore {
+  fill: var(--color-background);
+}
+
+.grooveCutout {
+  color: var(--color-background);
+  stroke-width: 1.65;
+}
+
+.indicator,
+.codeDot {
+  fill: currentColor;
+}
+
+.wordmark {
+  overflow: hidden;
+  font-size: 1rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

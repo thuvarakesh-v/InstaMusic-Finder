@@ -1,0 +1,15 @@
+.header h1 {
+  max-width: 22ch;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+@media (min-width: 48rem) {
+  .header h1 {
+    font-size: 1.875rem;
+  }
+}

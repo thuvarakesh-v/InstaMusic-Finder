@@ -1,0 +1,50 @@
+.wrapper {
+  position: relative;
+  display: grid;
+  gap: 0.35rem;
+  justify-items: start;
+}
+
+.button {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.32rem 0.6rem;
+  border: 1px solid rgb(29 185 84 / 45%);
+  border-radius: 0.3rem;
+  background: rgb(29 185 84 / 10%);
+  color: var(--color-accent-text);
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.status:empty {
+  display: none;
+}
+
+.status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.fallback {
+  overflow-wrap: anywhere;
+  color: var(--color-text);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.75rem;
+  user-select: all;
+}
+
+@media (hover: hover) {
+  .button:hover {
+    background: rgb(29 185 84 / 18%);
+  }
+}
