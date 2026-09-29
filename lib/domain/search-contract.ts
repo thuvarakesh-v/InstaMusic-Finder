@@ -86,7 +86,17 @@ export const searchApiResponseSchema = z.object({
     requestId: z.string(),
     partial: z.boolean(),
     providers: z.object({ spotify: providerStateSchema, musicbrainz: providerStateSchema }),
+    searchesRemaining: z.number().int().nonnegative().max(10),
+    allowanceNotice: z.string().nullable(),
   }),
+});
+
+export const searchAllowanceApiResponseSchema = z.object({
+  data: z.object({
+    searchesRemaining: z.number().int().nonnegative().max(10),
+    message: z.string().min(1),
+  }),
+  meta: z.object({ requestId: z.string() }),
 });
 
 export const apiErrorResponseSchema = z.object({
@@ -101,6 +111,7 @@ export const apiErrorResponseSchema = z.object({
 
 export type SearchData = z.infer<typeof searchDataSchema>;
 export type SearchApiResponse = z.infer<typeof searchApiResponseSchema>;
+export type SearchAllowanceApiResponse = z.infer<typeof searchAllowanceApiResponseSchema>;
 export type AlbumDetailApiResponse = z.infer<typeof albumDetailApiResponseSchema>;
 export type SearchSection = SearchData["sections"][keyof SearchData["sections"]];
 export type ProviderState = z.infer<typeof providerStateSchema>;

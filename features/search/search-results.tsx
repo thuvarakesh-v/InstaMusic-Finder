@@ -16,6 +16,8 @@ import {
   type SearchData,
 } from "@/lib/domain/search-contract";
 
+import { takeSearchCommit } from "./search-commit";
+import { useSearchAllowance } from "./search-allowance";
 import styles from "./search-results.module.css";
 
 type SearchEntity =
@@ -29,6 +31,7 @@ const labels = {
 
 export function SearchResults({ query, category }: { query: string; category: SearchCategory }) {
   const requestKey = `${category}:${query}`;
+  const { setSearchesRemaining } = useSearchAllowance();
   const [response, setResponse] = useState<SearchApiResponse | null>(null);
   const [responseKey, setResponseKey] = useState<string | null>(null);
   const [error, setError] = useState<{ key: string; message: string } | null>(null);
@@ -40,13 +43,15 @@ export function SearchResults({ query, category }: { query: string; category: Se
     const controller = new AbortController();
     const currentSequence = sequence.current + 1;
     sequence.current = currentSequence;
+    const commit = takeSearchCommit(query);
 
-    void requestSearch({ query, category, signal: controller.signal })
+    void requestSearch({ query, category, commit, signal: controller.signal })
       .then((next) => {
         if (controller.signal.aborted || sequence.current !== currentSequence) return;
         setResponse(next);
         setResponseKey(requestKey);
         setError(null);
+        setSearchesRemaining(next.meta.searchesRemaining);
       })
       .catch((requestError: unknown) => {
         if (controller.signal.aborted || sequence.current !== currentSequence) return;
@@ -57,7 +62,7 @@ export function SearchResults({ query, category }: { query: string; category: Se
       });
 
     return () => controller.abort();
-  }, [category, query, refresh, requestKey]);
+  }, [category, query, refresh, requestKey, setSearchesRemaining]);
 
   const visibleData = response?.data ?? null;
   const currentError = error?.key === requestKey ? error.message : null;
@@ -76,6 +81,7 @@ export function SearchResults({ query, category }: { query: string; category: Se
       const next = await requestSearch({ query, category, cursor: selectedCursor });
       setResponse((current) => current ? appendPage(current, next, category) : next);
       setResponseKey(requestKey);
+      setSearchesRemaining(next.meta.searchesRemaining);
     } catch (requestError) {
       setError({
         key: requestKey,
@@ -125,6 +131,7 @@ export function SearchResults({ query, category }: { query: string; category: Se
           Updating results for <strong>“{query}”</strong>. The list below is still for <strong>“{visibleData.query}”</strong>.
         </Notice>
       ) : null}
+      {response?.meta.allowanceNotice ? <Notice>{response.meta.allowanceNotice}</Notice> : null}
       {response?.meta.partial ? (
         <Notice>Part of this search didn’t respond. What’s available is shown below.</Notice>
       ) : null}
@@ -244,6 +251,7 @@ async function requestSearch(options: {
   query: string;
   category: SearchCategory;
   cursor?: string;
+  commit?: boolean;
   signal?: AbortSignal;
 }): Promise<SearchApiResponse> {
   const params = new URLSearchParams({
@@ -252,6 +260,7 @@ async function requestSearch(options: {
     limit: options.category === "all" ? "5" : "10",
   });
   if (options.cursor) params.set("cursor", options.cursor);
+  if (options.commit) params.set("commit", "1");
   const response = await fetch(`/api/v1/search?${params}`, { cache: "no-store", signal: options.signal });
   const payload: unknown = await response.json().catch(() => null);
   if (!response.ok) {

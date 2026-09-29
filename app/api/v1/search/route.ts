@@ -11,16 +11,22 @@ import {
   CatalogSearchService,
   normalizeCatalogSearchError,
 } from "@/lib/server/services/catalog-search";
+import {
+  SEARCH_ALLOWANCE_COOKIE,
+  SearchAllowanceCodec,
+  searchAllowanceCookieHeader,
+} from "@/lib/server/services/search-allowance";
 import { SearchCursorCodec } from "@/lib/server/services/search-cursor";
 
 export const runtime = "nodejs";
 
-const allowedParameters = new Set(["q", "type", "cursor", "limit"]);
+const allowedParameters = new Set(["q", "type", "cursor", "limit", "commit"]);
 const querySchema = z.object({
   q: z.string().min(1).max(200),
   type: searchCategorySchema.default("all"),
   cursor: z.string().max(2_048).nullable(),
   limit: z.number().int().min(1).max(10),
+  commit: z.boolean(),
 });
 
 export async function GET(request: Request): Promise<Response> {
@@ -40,11 +46,16 @@ export async function GET(request: Request): Promise<Response> {
     if (limitText !== null && !/^\d+$/.test(limitText)) {
       throw new CatalogSearchError("INVALID_INPUT", "Search limit must be a whole number.", 400);
     }
+    const commitText = url.searchParams.get("commit");
+    if (commitText !== null && commitText !== "0" && commitText !== "1") {
+      throw new CatalogSearchError("INVALID_INPUT", "Search commit must be 0 or 1.", 400);
+    }
     const parsed = querySchema.safeParse({
       q: url.searchParams.get("q")?.trim() ?? "",
       type: typeResult.data,
       cursor: url.searchParams.get("cursor"),
       limit: limitText === null ? defaultLimit : Number(limitText),
+      commit: commitText === "1",
     });
     if (!parsed.success || (parsed.data.type === "all" && parsed.data.limit > 5)) {
       throw new CatalogSearchError("INVALID_INPUT", "Search parameters are out of range.", 400);
@@ -64,6 +75,15 @@ export async function GET(request: Request): Promise<Response> {
       return errorResponse(requestId, "RATE_LIMITED", "Too many searches. Try again shortly.", 429, true, retryAfterSeconds);
     }
 
+    const cookieHeader = request.headers.get("cookie") ?? "";
+    const rawAllowance = readCookie(cookieHeader, SEARCH_ALLOWANCE_COOKIE);
+    const allowanceCodec = new SearchAllowanceCodec(env.CURSOR_SIGNING_SECRET);
+    const allowance = allowanceCodec.decide({
+      cookie: rawAllowance,
+      query: parsed.data.q,
+      commit: parsed.data.commit,
+    });
+
     const cursorCodec = new SearchCursorCodec(env.CURSOR_SIGNING_SECRET, {
       market: env.SPOTIFY_MARKET,
       mode: env.SPOTIFY_API_MODE,
@@ -74,17 +94,26 @@ export async function GET(request: Request): Promise<Response> {
       type: parsed.data.type,
       limit: parsed.data.limit,
       cursor: parsed.data.cursor,
+      useSpotify: allowance.useSpotify,
     });
 
+    const maxAgeSeconds = Math.max(1, Math.ceil((allowance.payload.resetsAt - Date.now()) / 1_000));
     return Response.json(
       {
         data: result.data,
-        meta: { requestId, partial: result.partial, providers: result.providers },
+        meta: {
+          requestId,
+          partial: result.partial,
+          providers: result.providers,
+          searchesRemaining: allowance.searchesRemaining,
+          allowanceNotice: allowance.allowanceNotice,
+        },
       },
       {
         headers: {
-          "Cache-Control": "private, max-age=30",
+          "Cache-Control": "private, no-store",
           "X-Request-ID": requestId,
+          "Set-Cookie": searchAllowanceCookieHeader(allowance.cookieValue, maxAgeSeconds),
         },
       },
     );
@@ -95,6 +124,18 @@ export async function GET(request: Request): Promise<Response> {
     }
     return providerErrorResponse(requestId, error);
   }
+}
+
+function readCookie(header: string, name: string): string | undefined {
+  for (const part of header.split(";")) {
+    const trimmed = part.trim();
+    if (!trimmed) continue;
+    const separator = trimmed.indexOf("=");
+    if (separator <= 0) continue;
+    if (trimmed.slice(0, separator) !== name) continue;
+    return trimmed.slice(separator + 1);
+  }
+  return undefined;
 }
 
 function providerErrorResponse(requestId: string, error: ProviderError): Response {

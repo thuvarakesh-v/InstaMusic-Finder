@@ -3,6 +3,7 @@
 import { Suspense, type ReactNode } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
+import { SearchAllowanceLine, SearchAllowanceProvider } from "./search-allowance";
 import { SearchForm } from "./search-form";
 import styles from "./search-screen.module.css";
 
@@ -11,13 +12,16 @@ export function CatalogChrome({ children }: { children: ReactNode }) {
   if (pathname !== "/" && pathname !== "/search") return children;
 
   return (
-    <div className={styles.screen}>
-      <Suspense fallback={<CatalogHeading query="" />}>
-        <CatalogHeadingFromUrl />
-      </Suspense>
-      <SearchForm />
-      {children}
-    </div>
+    <SearchAllowanceProvider>
+      <div className={styles.screen}>
+        <Suspense fallback={<CatalogHeading query="" />}>
+          <CatalogHeadingFromUrl />
+        </Suspense>
+        <SearchForm />
+        <SearchAllowanceLine />
+        {children}
+      </div>
+    </SearchAllowanceProvider>
   );
 }
 

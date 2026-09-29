@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Icon } from "@/components/ui/icon";
 import { parseSearchCategory } from "@/lib/domain/search";
 
+import { SEARCH_COMMIT_STORAGE_KEY } from "./search-commit";
 import styles from "./search-form.module.css";
 
 export function SearchForm() {
@@ -28,19 +29,6 @@ export function SearchForm() {
     return () => window.removeEventListener("popstate", syncFromHistory);
   }, []);
 
-  useEffect(() => {
-    const timeout = window.setTimeout(() => {
-      const normalized = normalizeQuery(query);
-      if (!normalized) return;
-      const nextCategory = parseSearchCategory(new URL(window.location.href).searchParams.get("type"));
-      const currentQuery = readUrlQuery();
-      if (normalized === currentQuery && window.location.pathname === "/search") return;
-      const params = new URLSearchParams({ q: normalized, type: nextCategory });
-      router.replace(`/search?${params.toString()}`, { scroll: false });
-    }, 500);
-    return () => window.clearTimeout(timeout);
-  }, [query, router]);
-
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     inputRef.current?.blur();
@@ -48,6 +36,11 @@ export function SearchForm() {
     if (!normalized) {
       router.push("/", { scroll: false });
       return;
+    }
+    try {
+      window.sessionStorage.setItem(SEARCH_COMMIT_STORAGE_KEY, normalized);
+    } catch {
+      // Storage may be unavailable; the server still accepts non-commit searches.
     }
     const nextCategory = parseSearchCategory(new URL(window.location.href).searchParams.get("type"));
     const params = new URLSearchParams({ q: normalized, type: nextCategory });

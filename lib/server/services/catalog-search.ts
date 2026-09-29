@@ -14,6 +14,7 @@ type SearchRequest = {
   type: SearchCategory;
   limit: number;
   cursor: string | null;
+  useSpotify?: boolean;
 };
 
 export type CatalogSearchResponse = {
@@ -49,9 +50,10 @@ export class CatalogSearchService {
         ? this.cursorCodec.decode(request.cursor, { query: classified.value, type: request.type })
         : { spotifyOffset: 0, musicbrainzOffset: 0 };
 
+    const useSpotify = request.useSpotify !== false;
     const spotifyTypes = selectedSpotifyTypes(request.type);
     const needsSongs = request.type === "all" || request.type === "song";
-    const spotifyPromise = spotifyTypes.length > 0
+    const spotifyPromise = useSpotify && spotifyTypes.length > 0
       ? settleWithin(
           this.providers.spotify.search(
             classified.value,
@@ -70,9 +72,9 @@ export class CatalogSearchService {
       : Promise.resolve<Settled<Page<Song>>>({ ok: true, value: emptyPage() });
 
     const [spotify, musicbrainz] = await Promise.all([spotifyPromise, musicBrainzPromise]);
-    const spotifyState = spotify.ok ? "ok" : providerState(spotify.error);
+    const spotifyState = !useSpotify ? "skipped" : spotify.ok ? "ok" : providerState(spotify.error);
     const musicBrainzState = needsSongs ? (musicbrainz.ok ? "ok" : providerState(musicbrainz.error)) : "skipped";
-    const anyUsableProvider = spotify.ok || (needsSongs && musicbrainz.ok);
+    const anyUsableProvider = spotify.ok || (needsSongs && musicbrainz.ok) || !useSpotify;
     if (!anyUsableProvider) throw bestProviderError(spotify, musicbrainz);
 
     const spotifyResult = spotify.ok ? spotify.value : emptySpotifyResult();
@@ -102,7 +104,7 @@ export class CatalogSearchService {
     });
     return {
       data,
-      partial: spotifyState !== "ok" || (needsSongs && musicBrainzState !== "ok"),
+      partial: (spotifyState !== "ok" && spotifyState !== "skipped") || (needsSongs && musicBrainzState !== "ok"),
       providers: { spotify: spotifyState, musicbrainz: musicBrainzState },
     };
   }
@@ -183,9 +185,9 @@ function buildSearchData(input: {
 }
 
 function providerSection<T>(items: T[], limit: number, nextCursor: string | null, state: ProviderState, provider: string) {
-  return state === "ok"
-    ? { items, limit, nextCursor, state: "ok" as const, message: null }
-    : { items: [], limit, nextCursor: null, state: "unavailable" as const, message: `${provider} didn’t respond for this part of the search. Try again.` };
+  if (state === "ok") return { items, limit, nextCursor, state: "ok" as const, message: null };
+  if (state === "skipped") return { items: [] as T[], limit, nextCursor: null, state: "ok" as const, message: null };
+  return { items: [] as T[], limit, nextCursor: null, state: "unavailable" as const, message: `${provider} didn’t respond for this part of the search. Try again.` };
 }
 
 function notApplicable<T>(message: string | null = null) {
