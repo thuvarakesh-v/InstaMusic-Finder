@@ -40,6 +40,11 @@
   "exclude": [
     "node_modules",
     "dummy project",
-    ".next-e2e"
+    ".next-e2e",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "tests",
+    "vitest.config.ts",
+    "playwright.config.ts"
   ]
 }
