@@ -3,11 +3,11 @@ import type { NextConfig } from "next";
 const isDev = process.env.NODE_ENV !== "production";
 const contentSecurityPolicy = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+  `script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://*.scdn.co https://i.scdn.co https://mosaic.scdn.co https://image-cdn-ak.spotifycdn.com https://image-cdn-fa.spotifycdn.com",
   "font-src 'self'",
-  `connect-src 'self'${isDev ? " ws: wss:" : ""}`,
+  `connect-src 'self' https://vitals.vercel-insights.com${isDev ? " ws: wss:" : ""}`,
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

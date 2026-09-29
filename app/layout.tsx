@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 
@@ -48,6 +49,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         </div>
         <ServiceWorkerRegister />
         <IntroDialog />
+        <Analytics />
       </body>
     </html>
   );
