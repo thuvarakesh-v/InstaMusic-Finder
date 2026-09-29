@@ -15,12 +15,11 @@ type EntityRowProps = {
   isrc?: string;
   imageUrl?: string | null;
   badge?: string;
-  sourceUrl?: string;
   href?: string;
   song?: Song;
 };
 
-export function EntityRow({ name, subtitle, detail, kind, isrc, imageUrl, badge, sourceUrl, href, song }: EntityRowProps) {
+export function EntityRow({ name, subtitle, detail, kind, isrc, imageUrl, badge, href, song }: EntityRowProps) {
   const art = (
     <span className={styles.art} aria-hidden="true">
       {imageUrl ? <Image alt="" src={imageUrl} width={56} height={56} unoptimized /> : kind.slice(0, 1).toUpperCase()}
@@ -28,7 +27,7 @@ export function EntityRow({ name, subtitle, detail, kind, isrc, imageUrl, badge,
   );
   const text = (
     <div className={styles.text}>
-      <h3 title={name}>{sourceUrl ? <a href={sourceUrl} target="_blank" rel="noopener noreferrer" title={name}>{name}</a> : name}</h3>
+      <h3 title={name}>{name}</h3>
       <p title={subtitle}>{subtitle}</p>
       {detail ? <p title={detail}>{detail}</p> : null}
       {kind === "song" && isrc ? null : badge ? <p className={styles.badge}>{badge}</p> : null}

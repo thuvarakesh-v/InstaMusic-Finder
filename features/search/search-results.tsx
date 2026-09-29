@@ -229,7 +229,6 @@ function SearchEntityRow({ entity }: { entity: SearchEntity }) {
         isrc={code}
         imageUrl={entity.imageUrl}
         badge={badge}
-        sourceUrl={source?.url}
         song={entity}
       />
     );

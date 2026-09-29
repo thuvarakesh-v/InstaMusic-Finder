@@ -223,7 +223,8 @@ test("core screens stay usable with reduced motion and keep the last copy contro
 
   await page.getByRole("link", { name: "Synthetic album" }).click();
   await expect(page.getByRole("heading", { name: "Synthetic album" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Album track" })).toHaveAttribute("rel", "noopener noreferrer");
+  await expect(page.getByText("Album track", { exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Album track" })).toHaveCount(0);
   await expectNoOverflowOrObscuredCopy(page);
 
   await page.goto("/saved");
@@ -231,7 +232,7 @@ test("core screens stay usable with reduced motion and keep the last copy contro
   await expectNoOverflowOrObscuredCopy(page);
 });
 
-test("an album opens inside the app and its track title still links to Spotify", async ({ page }, testInfo) => {
+test("an album opens inside the app and its track title does not link to Spotify", async ({ page }, testInfo) => {
   await page.goto("/search?q=Synthetic+query&type=all");
   await page.getByRole("link", { name: "Synthetic album" }).click();
 
@@ -239,7 +240,8 @@ test("an album opens inside the app and its track title still links to Spotify",
   await expect(page.getByRole("heading", { name: "Synthetic album" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Copy isrc:USRC17607839 for Album track" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Save USRC17607839 for Album track" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Album track" })).toHaveAttribute("href", "https://open.spotify.com/track/1234567890123456789001");
+  await expect(page.getByText("Album track", { exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Album track" })).toHaveCount(0);
   await page.screenshot({ path: testInfo.outputPath("album.png"), fullPage: true });
 });
 

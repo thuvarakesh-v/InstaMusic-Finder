@@ -67,7 +67,7 @@ All, Songs and Albums appear only once a query is present. All renders two indep
 
 ## Track presentation
 
-Show original square artwork without crop/overlay, full accessible title, artists, then album and year on their own line when known (`Album · year`), and duration when supplied. Copy Code sits under the artwork. The save bookmark sits at the top right of the row. Show a provider source link when one exists. Do not manufacture missing metadata. Text may visually truncate but the full title must remain accessible. The resting copy control reads Copy Code and changes to Copied. It does not display the code. The accessible name, the live “Copied” announcement and the clipboard value are still exactly `isrc:CODE`.
+Show original square artwork without crop/overlay, full accessible title, artists, then album and year on their own line when known (`Album · year`), and duration when supplied. Copy Code sits under the artwork. The save bookmark sits at the top right of the row. Track titles are plain text: they do not open Spotify and do not copy. Do not manufacture missing metadata. Text may visually truncate but the full title must remain accessible. The resting copy control reads Copy Code and changes to Copied. It does not display the code. The accessible name, the live “Copied” announcement and the clipboard value are still exactly `isrc:CODE`.
 
 State machine: unresolved -> resolving -> resolved / missing / retryable-error / restricted. Unresolved rows have “Find code”; resolved rows have individual copy and save buttons. Multiple provider-reported codes appear as separate code controls associated with the same recording, with source labels in expanded details. No bulk controls or numeric confidence badge. Conflict candidates remain separate results.
 
@@ -75,7 +75,7 @@ Copy success: brief inline “Copied” plus polite live announcement. No modal,
 
 ## Detail screens
 
-Album: in-app release header and complete ordered track list. Resolve each recording through its exact Spotify track ID with three-request concurrency; each resolved row uses the same Copy Code control, or shows “Code not found” or a lookup failure. A track title opens Spotify, while the code control only copies the exact prefixed code.
+Album: in-app release header and complete ordered track list. Resolve each recording through its exact Spotify track ID with three-request concurrency; each resolved row uses the same Copy Code control, or shows “Code not found” or a lookup failure. A track title is plain text and does not open Spotify; only Copy Code copies the exact prefixed code and only Save toggles a bookmark.
 
 ## Saved
 

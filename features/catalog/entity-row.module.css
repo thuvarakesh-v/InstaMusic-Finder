@@ -79,19 +79,9 @@
   align-self: start;
 }
 
-.text a {
-  color: inherit;
-  text-decoration: none;
-}
-
 @media (hover: hover) {
   .clickable:hover {
     background: var(--color-surface-raised);
-  }
-
-  .text a:hover {
-    text-decoration: underline;
-    text-underline-offset: 0.2em;
   }
 }
 

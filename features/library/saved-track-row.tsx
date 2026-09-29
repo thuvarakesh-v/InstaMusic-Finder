@@ -27,7 +27,7 @@ export function SavedTrackRow({
         {record.artworkUrl ? <Image src={record.artworkUrl} alt="" width={56} height={56} unoptimized /> : "S"}
       </span>
       <div className={styles.text}>
-        <h2 title={record.trackName}>{record.spotifyTrackUrl ? <a href={record.spotifyTrackUrl} target="_blank" rel="noopener noreferrer" title={record.trackName}>{record.trackName}</a> : record.trackName}</h2>
+        <h2 title={record.trackName}>{record.trackName}</h2>
         <p title={record.artistName}>{record.artistName}</p>
         {detail ? <p title={detail}>{detail}</p> : null}
       </div>

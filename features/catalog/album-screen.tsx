@@ -69,13 +69,12 @@ export function AlbumScreen({ albumId }: { albumId: string }) {
           <p>{artists}{album.releaseDate ? ` · ${album.releaseDate.slice(0, 4)}` : ""} · {trackLabel}</p>
         </div>
       </header>
-      {response.meta.partial ? <Notice>Some track codes didn’t resolve. You can still open those tracks in Spotify.</Notice> : null}
+      {response.meta.partial ? <Notice>Some track codes didn’t resolve.</Notice> : null}
       {tracks.length === 0 ? <EmptyState title="No tracks found" description="Spotify didn’t list any tracks for this album." /> : (
         <section aria-labelledby="album-track-heading">
           <h2 className={styles.trackHeading} id="album-track-heading">Tracks</h2>
           <div className={styles.trackList}>
             {tracks.map((track) => {
-              const source = track.sources.find((item) => item.provider === "spotify");
               const code = track.isrcs[0]?.code;
               const badge = track.isrcState === "missing" ? "Code not found" : track.isrcState === "error" ? "Lookup failed" : "Code not ready";
               return (
@@ -87,7 +86,6 @@ export function AlbumScreen({ albumId }: { albumId: string }) {
                   imageUrl={album.imageUrl}
                   isrc={code}
                   badge={code ? undefined : badge}
-                  sourceUrl={source?.url}
                   song={track}
                 />
               );
