@@ -5,16 +5,18 @@ import { z } from "zod";
 import {
   DAILY_SEARCH_LIMIT,
   SEARCH_ALLOWANCE_NOTICE,
-  SEARCH_ALLOWANCE_WINDOW_MS,
   formatSearchAllowance,
+  nextLocalMidnight,
+  resolveTimeZone,
 } from "@/lib/domain/search-allowance";
 
 export const SEARCH_ALLOWANCE_COOKIE = "instamusic_search_allowance";
 
 const allowancePayloadSchema = z.object({
-  version: z.literal(1),
+  version: z.literal(2),
   used: z.number().int().nonnegative().max(DAILY_SEARCH_LIMIT),
   resetsAt: z.number().int().positive(),
+  timeZone: z.string().min(1).max(64),
   granted: z.array(z.string().length(64)).max(DAILY_SEARCH_LIMIT),
 });
 
@@ -67,6 +69,7 @@ export class SearchAllowanceCodec {
     cookie: string | undefined;
     query: string;
     commit: boolean;
+    timeZone?: string | null;
   }): SearchAllowanceDecision {
     let payload = this.read(input.cookie);
     const queryHash = fingerprint(input.query);
@@ -74,10 +77,12 @@ export class SearchAllowanceCodec {
 
     if (input.commit && !alreadyGranted && payload.used < DAILY_SEARCH_LIMIT) {
       if (payload.used === 0) {
+        const timeZone = resolveTimeZone(input.timeZone);
         payload = {
-          version: 1,
+          version: 2,
           used: 0,
-          resetsAt: this.now() + SEARCH_ALLOWANCE_WINDOW_MS,
+          resetsAt: nextLocalMidnight(this.now(), timeZone),
+          timeZone,
           granted: [],
         };
       }
@@ -105,11 +110,13 @@ export class SearchAllowanceCodec {
     return Math.max(0, DAILY_SEARCH_LIMIT - payload.used);
   }
 
-  empty(): SearchAllowancePayload {
+  empty(timeZone?: string | null): SearchAllowancePayload {
+    const zone = resolveTimeZone(timeZone);
     return {
-      version: 1,
+      version: 2,
       used: 0,
-      resetsAt: this.now() + SEARCH_ALLOWANCE_WINDOW_MS,
+      resetsAt: nextLocalMidnight(this.now(), zone),
+      timeZone: zone,
       granted: [],
     };
   }

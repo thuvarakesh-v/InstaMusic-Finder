@@ -44,7 +44,7 @@ Idle entry (no query):
 InstaMusic Finder                       Coffee | sun/moon
 Find your track, copy the code, then paste it into Instagram Music search.
 [ Track, artist, or album ]
-[ You can search 10 times a day. 10 remaining today. ]
+[ You can search 15 times a day. 15 remaining today. ]
 Recently saved                                        View all
 [art] Track / Artist / Album · year   [Copy Code] [bookmark]
 Search | Saved
@@ -61,7 +61,7 @@ Albums
 
 The entry instruction is visible only while no query is present. It is hidden on results and is not a dismissible wizard. Catalog search starts only when the user presses Search or Enter; typing alone does not navigate or call a provider. Under the search bar, a bordered surface card shows the remaining daily Spotify search allowance and updates after each search. On the idle home, up to three recently saved recordings appear beneath that card, newest first, with View all opening `/saved`; the preview is omitted while saved codes are loading and when none are saved. Catalog search accepts a track, artist or album name. An ISRC, Spotify URL/URI or other URL is rejected before any provider call and shown on the results surface. An explicit search button supports mobile and assistive technology.
 
-Each browser may commit up to 10 Spotify-backed searches in a rolling 24-hour window. Songs, Albums and Load more for a query that already used Spotify do not spend another of those 10. After the allowance is used, a new search still returns MusicBrainz song results and shows: “For more relevant results, try again in 24 hours.”
+Each browser may commit up to 15 Spotify-backed searches until 12:00 AM in that browser’s local timezone. Songs, Albums and Load more for a query that already used Spotify do not spend another of those 15. After the allowance is used, a new search still returns MusicBrainz song results and shows: “For more relevant results, try again after 12 AM.”
 
 All, Songs and Albums appear only once a query is present. All renders two independently labelled sections with up to five initial items each. “View all” changes category and preserves query. A category view pages through ten results at a time with Load more. Artist results remain absent. Empty and failed sections are distinguished. Changing query or category cancels stale UI work, resets relevant page state and preserves URL navigation. Use links for navigations and category URLs, with an accessible current state; do not use ARIA tab semantics without implementing the full keyboard pattern.
 

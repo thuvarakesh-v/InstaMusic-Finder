@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from "react";
 
-import { formatSearchAllowance } from "@/lib/domain/search-allowance";
+import { DAILY_SEARCH_LIMIT, formatSearchAllowance } from "@/lib/domain/search-allowance";
 import { searchAllowanceApiResponseSchema } from "@/lib/domain/search-contract";
 
 import styles from "./search-allowance.module.css";
@@ -47,7 +47,7 @@ export function SearchAllowanceProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const message = useMemo(
-    () => formatSearchAllowance(searchesRemaining ?? 10),
+    () => formatSearchAllowance(searchesRemaining ?? DAILY_SEARCH_LIMIT),
     [searchesRemaining],
   );
 
@@ -63,7 +63,7 @@ export function useSearchAllowance(): SearchAllowanceContextValue {
   const value = useContext(SearchAllowanceContext);
   if (!value) {
     return {
-      message: formatSearchAllowance(10),
+      message: formatSearchAllowance(DAILY_SEARCH_LIMIT),
       searchesRemaining: null,
       setSearchesRemaining: noopSetSearchesRemaining,
     };

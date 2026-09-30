@@ -8,6 +8,7 @@ import { Notice } from "@/components/ui/notice";
 import { ResultSkeleton } from "@/components/ui/skeleton";
 import { EntityRow } from "@/features/catalog/entity-row";
 import type { SearchCategory } from "@/lib/domain/search";
+import { CLIENT_TIME_ZONE_HEADER, readClientTimeZone } from "@/lib/domain/search-allowance";
 import { NAME_ONLY_SEARCH_MESSAGE } from "@/lib/domain/search-input";
 import {
   apiErrorResponseSchema,
@@ -260,7 +261,11 @@ async function requestSearch(options: {
   });
   if (options.cursor) params.set("cursor", options.cursor);
   if (options.commit) params.set("commit", "1");
-  const response = await fetch(`/api/v1/search?${params}`, { cache: "no-store", signal: options.signal });
+  const response = await fetch(`/api/v1/search?${params}`, {
+    cache: "no-store",
+    signal: options.signal,
+    headers: { [CLIENT_TIME_ZONE_HEADER]: readClientTimeZone() },
+  });
   const payload: unknown = await response.json().catch(() => null);
   if (!response.ok) {
     const parsedError = apiErrorResponseSchema.safeParse(payload);

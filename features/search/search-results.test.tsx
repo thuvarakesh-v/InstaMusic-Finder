@@ -249,7 +249,7 @@ function searchResponse(
       requestId: "fixture-request",
       partial: false,
       providers: { spotify: "ok" as const, musicbrainz: "ok" as const },
-      searchesRemaining: 10,
+      searchesRemaining: 15,
       allowanceNotice: null,
     },
   };

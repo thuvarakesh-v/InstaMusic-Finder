@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { DAILY_SEARCH_LIMIT } from "./search-allowance";
 import { searchCategorySchema } from "./search";
 
 const providerRefSchema = z.object({
@@ -86,14 +87,14 @@ export const searchApiResponseSchema = z.object({
     requestId: z.string(),
     partial: z.boolean(),
     providers: z.object({ spotify: providerStateSchema, musicbrainz: providerStateSchema }),
-    searchesRemaining: z.number().int().nonnegative().max(10),
+    searchesRemaining: z.number().int().nonnegative().max(DAILY_SEARCH_LIMIT),
     allowanceNotice: z.string().nullable(),
   }),
 });
 
 export const searchAllowanceApiResponseSchema = z.object({
   data: z.object({
-    searchesRemaining: z.number().int().nonnegative().max(10),
+    searchesRemaining: z.number().int().nonnegative().max(DAILY_SEARCH_LIMIT),
     message: z.string().min(1),
   }),
   meta: z.object({ requestId: z.string() }),

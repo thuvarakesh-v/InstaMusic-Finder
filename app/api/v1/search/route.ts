@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { z } from "zod";
 
 import { searchCategorySchema } from "@/lib/domain/search";
+import { CLIENT_TIME_ZONE_HEADER } from "@/lib/domain/search-allowance";
 import { readServerEnv } from "@/lib/server/env";
 import { type ProviderError } from "@/lib/server/infra/provider-error";
 import { createProviderRuntime } from "@/lib/server/providers/runtime";
@@ -82,6 +83,7 @@ export async function GET(request: Request): Promise<Response> {
       cookie: rawAllowance,
       query: parsed.data.q,
       commit: parsed.data.commit,
+      timeZone: request.headers.get(CLIENT_TIME_ZONE_HEADER),
     });
 
     const cursorCodec = new SearchCursorCodec(env.CURSOR_SIGNING_SECRET, {

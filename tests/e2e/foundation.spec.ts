@@ -30,8 +30,8 @@ test.beforeEach(async ({ page }) => {
       contentType: "application/json",
       body: JSON.stringify({
         data: {
-          searchesRemaining: 10,
-          message: "You can search 10 times a day. 10 remaining today.",
+          searchesRemaining: 15,
+          message: "You can search 15 times a day. 15 remaining today.",
         },
         meta: { requestId: "allowance-request" },
       }),
@@ -46,7 +46,7 @@ test("mobile-first search shell exposes the required instruction", async ({ page
   await page.goto("/");
   await expect(page.getByRole("searchbox", { name: "Search music" })).toHaveAttribute("placeholder", "Track, artist, or album");
   await expect(page.getByText("Find your track, copy the code, then paste it into Instagram Music search.")).toBeVisible();
-  await expect(page.getByText("You can search 10 times a day. 10 remaining today.")).toBeVisible();
+  await expect(page.getByText("You can search 15 times a day. 15 remaining today.")).toBeVisible();
   await expect(page.getByText("Searches go to Spotify and MusicBrainz. Saved codes stay in this browser.")).toHaveCount(0);
   await expect(page.getByText("Catalog data from Spotify and MusicBrainz.")).toHaveCount(0);
   await expect(page.getByRole("navigation", { name: "Search categories" })).toHaveCount(0);
@@ -297,7 +297,7 @@ function searchResponse(query: string) {
       requestId: "fixture-request",
       partial: false,
       providers: { spotify: "ok", musicbrainz: "ok" },
-      searchesRemaining: 10,
+      searchesRemaining: 15,
       allowanceNotice: null,
     },
   };
